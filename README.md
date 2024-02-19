@@ -42,18 +42,18 @@ python manage.py createsuperuser
 ```
 
 ## Executando o Servidor de Desenvolvimento
-# Execute o servidor de desenvolvimento com o seguinte comando:
+### Execute o servidor de desenvolvimento com o seguinte comando:
 ```bash
 python manage.py runserver
 ```
 Acesse o projeto em seu navegador em http://localhost:8000.
 
-## Contribuindo
+### Contribuindo
 Se você deseja contribuir com este projeto, siga estas etapas:
 
-Referências:
+### Referências:
 #1 documentação kagle
 https://www.kaggle.com/code/rss1011/surface-crack-detection-cnn
 
-Licença
+### Licença
 Este projeto está licenciado sob a Licença MIT.
