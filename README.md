@@ -32,6 +32,7 @@ pip install -r requirements.txt
 
 # Configure as variáveis de ambiente:
 # Crie um arquivo `.env` na raiz do projeto e defina as variáveis de ambiente necessárias, como chaves secretas, configurações de banco de dados, etc.
+# As variaveis de desenvolvimento estão no arquivo .env_auxiliar, pode copiar e colar dentro do arquivo .env
 
 # Aplique as migrações do Django:
 python manage.py migrate
