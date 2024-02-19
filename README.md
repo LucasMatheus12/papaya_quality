@@ -18,10 +18,10 @@ Certifique-se de ter instalado em seu ambiente de desenvolvimento:
 
 ```bash
 # Clone o repositório:
-git clone https://github.com/seu-usuario/nome-do-repositorio.git
+git clone https://github.com/LucasMatheus12/papaya_quality
 
 # Navegue até o diretório do projeto:
-cd nome-do-repositorio
+cd papaya_quality
 
 # Crie e ative um ambiente virtual (opcional, mas recomendado):
 virtualenv venv
