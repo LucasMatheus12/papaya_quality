@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Mamões</title>
+    <style>
+        body {
+            background-image: url('{{ STATIC_URL }}/static/background.png');
+            background-size: cover; /* Ajusta o tamanho da imagem para cobrir toda a área do corpo */
+            background-position: center; /* Centraliza a imagem */
+            background-repeat: no-repeat; /* Evita a repetição da imagem */
+            /* Adicione outras propriedades de estilo conforme necessário */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+
+    <h1>Treine</h1>
+    <form enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+        <br>
+        <button type="submit">Treinar</button>
+    </form>
+
+    Resultado: {{mensagem}}
+    <br>
+</body>
+</html>

@@ -32,18 +32,10 @@ def home_view(request):
     partiallymature_dir = os.path.join(BASE_DIR, 'papaya_dataset_/papaya_dataset_01/partiallymature/')
     unmature_dir = os.path.join(BASE_DIR, 'papaya_dataset_/papaya_dataset_01/unmature/')
     if request.method=='POST':
-        arquivo = request.FILES.get('arquivo')
-        for dirname, _, filenames in os.walk(os.path.join(BASE_DIR, 'papaya_dataset_/')):
-            for filename in filenames:
-                mensagem.append(os.path.join(dirname, filename))
-        
 
         mature_images = os.listdir(mature_dir)
         partiallymature_images = os.listdir(partiallymature_dir)
         unmature_images = os.listdir(unmature_dir)
-        mensagem.append(len(mature_images))
-        mensagem.append(len(partiallymature_images))
-        mensagem.append(len(unmature_images))
         train_mature_images = mature_images[:int(.8*(len(mature_images)))]
         val_mature_images = mature_images[int(.8*(len(mature_images))):]
 
@@ -163,14 +155,29 @@ def home_view(request):
             callbacks = [early_stopping]
         )
 
+
+        plt.plot(history.history['loss'], label = 'loss')
+        plt.plot(history.history['val_loss'], label = 'val_loss')
+        plt.title("Função de perda")
+        plt.xlabel('Épocas')
+        plt.ylabel('MSE')
+        plt.legend(["Treinando"], loc='upper left')
+        plt.show()
+        
+
+        # Carrega o modelo treinado
+        model.save(os.path.join(BASE_DIR,'model_train.keras'))
+
+        mensagem.append(f"O modelo foi treinado com sucesso.")
+        
     context = {
         "arquivo": arquivo,
-        "mensagem": mensagem,
+        "mensagem": "mensagem",
         
     }
 
     return render(
         request,
-        'home/index.html',
+        'home/index_treinamento.html',
         context,
     )
