@@ -47,7 +47,7 @@ def teste_treinado_view(request):
         mensagem.append(f"O modelo prevê que a fruta é {resultado}.")
         # Exclui o arquivo temporário
         os.remove(file_path)
-        
+    
     context = {
         "arquivo": arquivo,
         "mensagem": mensagem

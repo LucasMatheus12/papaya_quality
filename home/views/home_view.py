@@ -112,48 +112,35 @@ def home_view(request):
         train_dataset = train_data_gen.flow_from_directory(
             os.path.join(BASE_DIR, train_dir),
             target_size = (227,227),
-            class_mode = 'binary'
+            class_mode = 'categorical'
         )
 
         val_dataset = val_data_gen.flow_from_directory(
             os.path.join(BASE_DIR, val_dir),
             target_size = (227,227),
-            class_mode = 'binary'
+            class_mode = 'categorical'
         )
 
         input_shape = (227,227,3)
 
-        model = tf.keras.Sequential([
-            tf.keras.layers.Input(shape = input_shape),
-            
-            tf.keras.layers.Conv2D(10, 3, activation = 'relu'),
-            tf.keras.layers.MaxPool2D(),
-            tf.keras.layers.Conv2D(10, 3, activation = 'relu'),
-            tf.keras.layers.MaxPool2D(),
-            tf.keras.layers.Conv2D(10, 3, activation = 'relu'),
-            tf.keras.layers.MaxPool2D(),
-            
-            tf.keras.layers.GlobalAveragePooling2D(),
-            
-            tf.keras.layers.Dense(1, activation = 'sigmoid')
-        ])
+        model = tf.keras.Sequential()
+        model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(227, 227, 3)))
+        model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+        model.add(tf.keras.layers.Flatten())
 
-        model.compile(
-            loss = 'binary_crossentropy',
-            metrics = ['accuracy'],
-            optimizer = 'adam'
-        )
+        model.add(tf.keras.layers.Dense(64, activation='relu'))
+        model.add(tf.keras.layers.Dense(3, activation='softmax'))
+
+        opt = 'adam' #tf.keras.optimizers.Adam(learning_rate=0.0001)
 
         model.summary()
+        model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_accuracy', mode = 'max', patience = 15)
 
-        history = model.fit(
-            train_dataset,
-            epochs = 100,
-            validation_data = val_dataset,
-            callbacks = [early_stopping]
-        )
+        #early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_accuracy', mode = 'max', patience = 15)
+
+        history = model.fit(train_dataset, epochs=2, validation_data=val_dataset)
+
 
 
         """ plt.plot(history.history['loss'], label = 'loss')
