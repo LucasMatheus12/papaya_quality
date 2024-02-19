@@ -156,23 +156,23 @@ def home_view(request):
         )
 
 
-        plt.plot(history.history['loss'], label = 'loss')
+        """ plt.plot(history.history['loss'], label = 'loss')
         plt.plot(history.history['val_loss'], label = 'val_loss')
         plt.title("Função de perda")
         plt.xlabel('Épocas')
         plt.ylabel('MSE')
         plt.legend(["Treinando"], loc='upper left')
-        plt.show()
+        plt.show() """
         
 
         # Carrega o modelo treinado
-        model.save(os.path.join(BASE_DIR,'model_train.keras'))
+        model.save(os.path.join(BASE_DIR,'model_train.h5'))
 
         mensagem.append(f"O modelo foi treinado com sucesso.")
         
     context = {
         "arquivo": arquivo,
-        "mensagem": "mensagem",
+        "mensagem": mensagem,
         
     }
 

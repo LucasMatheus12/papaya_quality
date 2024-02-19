@@ -33,7 +33,7 @@ def teste_treinado_view(request):
         test_image = tf.expand_dims(test_image, axis=0)
 
         # Carrega o modelo treinado
-        model = tf.keras.models.load_model(os.path.join(BASE_DIR,'model_train.keras'))
+        model = tf.keras.models.load_model(os.path.join(BASE_DIR,'model_train.h5'))
 
         # Faz a previsão
         prediction = model.predict(test_image)
