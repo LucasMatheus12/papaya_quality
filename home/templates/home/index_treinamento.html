@@ -13,6 +13,60 @@
             background-repeat: no-repeat; /* Evita a repetição da imagem */
             /* Adicione outras propriedades de estilo conforme necessário */
             color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        
+        form {
+            text-align: center;
+        }
+        
+        button[type="submit"] {
+            background-color: orange;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #ff9900;
+        }
+        
+        a {
+            text-decoration: none;
+        }
+        
+        a button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: orange;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            text-align: center;
+            width: 150px;
+        }
+        
+        a button:hover {
+            background-color: #ff9900;
+        }
+        .resultado {
+            background-color: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Sombra */
         }
     </style>
 </head>
@@ -25,10 +79,11 @@
         <br>
         <button type="submit">Treinar</button>
     </form>
-
+    <h1 class="resultado">
     Resultado: {{mensagem}}
+    </h1>
     <br><br>
-    <a href="/teste_treinado/"> <button>Testar</button> </a>
+    <a href="/teste_treinado/"> <button>Enviar arquivo e TESTAR</button> </a>
     
     <br>
 </body>

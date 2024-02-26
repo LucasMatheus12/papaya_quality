@@ -1,6 +1,4 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 import shutil
@@ -8,8 +6,6 @@ from configs.settings import BASE_DIR
 import matplotlib.image as mpimg
 import random
 import matplotlib
-from tkinter import Tk, Canvas
-from PIL import Image, ImageTk
 import matplotlib
 matplotlib.use('agg')
 import tensorflow as tf
@@ -121,8 +117,6 @@ def home_view(request):
             class_mode = 'categorical'
         )
 
-        input_shape = (227,227,3)
-
         model = tf.keras.Sequential()
         model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(227, 227, 3)))
         model.add(tf.keras.layers.MaxPooling2D((2, 2)))
@@ -131,7 +125,7 @@ def home_view(request):
         model.add(tf.keras.layers.Dense(64, activation='relu'))
         model.add(tf.keras.layers.Dense(3, activation='softmax'))
 
-        opt = 'adam' #tf.keras.optimizers.Adam(learning_rate=0.0001)
+        opt = tf.keras.optimizers.Adam(learning_rate=0.0001)
 
         model.summary()
         model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -139,7 +133,7 @@ def home_view(request):
 
         #early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_accuracy', mode = 'max', patience = 15)
 
-        history = model.fit(train_dataset, epochs=2, validation_data=val_dataset)
+        history = model.fit(train_dataset, epochs=5, validation_data=val_dataset)
 
 
 

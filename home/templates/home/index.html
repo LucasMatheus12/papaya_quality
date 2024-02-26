@@ -13,6 +13,59 @@
             background-repeat: no-repeat; /* Evita a repetição da imagem */
             /* Adicione outras propriedades de estilo conforme necessário */
             color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            max-width: 400px; /* Defina a largura máxima do formulário */
+            margin: 0 auto; /* Centraliza o formulário horizontalmente */
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5); /* Cor de fundo com transparência */
+            border-radius: 10px; /* Borda arredondada */
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: orange; /* Cor de fundo do botão */
+            color: black; /* Cor do texto do botão */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Transição suave da cor de fundo */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #ff9900; /* Cor de fundo do botão ao passar o mouse */
+        }
+
+        h1 {
+            text-align: center;
+        }
+        /* CSS para estilizar o botão "Treinar" */
+        a button {
+            display: block; /* Para que o botão se torne um bloco e ocupe a largura total do contêiner */
+            margin: 20px auto; /* Define margens para centralizar o botão */
+            padding: 10px 20px;
+            background-color: orange; /* Cor de fundo do botão */
+            color: black; /* Cor do texto do botão */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Transição suave da cor de fundo */
+            text-decoration: none; /* Remove o sublinhado padrão do link */
+            text-align: center; /* Centraliza o texto no botão */
+            width: 150px; /* Defina uma largura fixa para o botão, ajuste conforme necessário */
+        }
+
+        a button:hover {
+            background-color: #ff9900; /* Cor de fundo do botão ao passar o mouse */
         }
     </style>
 </head>
@@ -24,13 +77,18 @@
         {% csrf_token %}
         <input type="file" name="arquivo" >
         <br>
+        <h1></h1>
         <button type="submit">Enviar</button>
     </form>
-
-    Resultado: {{mensagem}}
+    <h1>Resultado: {{mensagem}}</h1>
+    
     <br>
 
-    <a href="/"> <button>Treinar</button> </a>
+    <br>
+
+    <a href="/"> 
+        <button title="Clique para treinar a aplicação novamente">TREINE a aplicação</button> 
+    </a>
 
 </body>
 </html>
