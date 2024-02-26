@@ -74,14 +74,14 @@
 
 
     <h1>Treine</h1>
-    <form enctype="multipart/form-data" method="POST">
+    <form class="resultado" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         <br>
         <button type="submit">Treinar</button>
+        <h1 >
+        Resultado: {{mensagem|default:""}}
+        </h1>
     </form>
-    <h1 class="resultado">
-    Resultado: {{mensagem}}
-    </h1>
     <br><br>
     <a href="/teste_treinado/"> <button>Enviar arquivo e TESTAR</button> </a>
     
