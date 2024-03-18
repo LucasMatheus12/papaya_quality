@@ -102,26 +102,16 @@ def home_view(request):
         
         
 
-        train_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.,validation_split=0.2)
+        train_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.)
         val_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.)
-        test_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.)
 
         train_dataset = train_data_gen.flow_from_directory(
             os.path.join(BASE_DIR, train_dir),
             target_size = (227,227),
-            class_mode = 'categorical',
-            subset="training"
-
+            class_mode = 'categorical'
         )
 
         val_dataset = val_data_gen.flow_from_directory(
-            os.path.join(BASE_DIR, train_dir),
-            target_size = (227,227),
-            class_mode = 'categorical',
-            subset="validation"
-        )
-
-        test_dataset = test_data_gen.flow_from_directory(
             os.path.join(BASE_DIR, val_dir),
             target_size = (227,227),
             class_mode = 'categorical'
@@ -141,36 +131,36 @@ def home_view(request):
         model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
 
-        #early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_accuracy', mode = 'max', patience = 5)
+        #early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_accuracy', mode = 'max', patience = 15)
 
         history = model.fit(train_dataset, epochs=5, validation_data=val_dataset)
         
         plt.plot(history.history['loss'], label = 'loss')
-        plt.plot(history.history['accuracy'], label = 'accuracy')
+        plt.plot(history.history['val_loss'], label = 'val_loss')
         plt.title("Função de perda")
         plt.xlabel('Épocas')
         plt.ylabel('MSE')
         plt.legend(["Treinando"], loc='upper left')
-        plt.savefig('my_figure.png')
+        plt.savefig('my_figure2.png')
 
         from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
         import numpy as np
         # Fazendo previsões no conjunto de validação
         #predictions = model.predict(val_dataset)
         #predicted_classes = np.argmax(predictions, axis=-1)
-        output_model = np.argmax(model.predict(test_dataset), axis=-1)
-        #y_test_class =np.argmax(test_dataset, axis=-1)
+        output_model = np.argmax(model.predict(val_dataset), axis=-1)
+        y_test_class =np.argmax(model.predict(val_dataset), axis=-1)
 
         # Obtendo as classes verdadeiras do conjunto de validação
-        true_classes = test_dataset.classes
+        true_classes = val_dataset.classes
         print("P Classes", output_model)
-        print("T Classes ", true_classes)
+        print("T Classes ", y_test_class)
 
         # Calculando as métricas de avaliação
-        accuracy = accuracy_score(true_classes, output_model)
-        precision = precision_score(true_classes, output_model, average='macro')
-        recall = recall_score(true_classes, output_model, average='macro')
-        f1 = f1_score(true_classes, output_model, average='macro')
+        accuracy = accuracy_score(y_test_class, output_model)
+        precision = precision_score(y_test_class, output_model, average='macro')
+        recall = recall_score(y_test_class, output_model, average='macro')
+        f1 = f1_score(y_test_class, output_model, average='macro')
 
         print("Acurácia:", accuracy)
         print("Precisão:", precision)
