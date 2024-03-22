@@ -1,195 +1,236 @@
 from django.shortcuts import render
 import matplotlib.pyplot as plt
-import os
-import shutil
 from configs.settings import BASE_DIR
-import matplotlib.image as mpimg
-import random
-import matplotlib
-import matplotlib
-matplotlib.use('agg')
+import itertools
+import numpy as np
+import pandas as pd
+import os
+import cv2
 import tensorflow as tf
+from keras.layers import Dropout, Flatten, Dense, Conv2D, MaxPooling2D
+from keras import Sequential
+from keras.utils import to_categorical
+from keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+from PIL import Image
 
-def view_random_image(target_dir, target_class):
-    target_folder = target_dir + 'mature' + '/'
-    random_image = random.choice(os.listdir(target_folder))
-    
-    img = mpimg.imread(target_folder + random_image)
-    print(img.shape)
-    plt.title('mature')
-    plt.imshow(img)
-    plt.axis('off')
+def plot_confusion_matrix(
+        cm, 
+        classes,
+        normalize=False,
+        title='Confusion matrix',
+        cmap=plt.cm.Blues
+    ):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True class')
+    plt.xlabel('Predicted class')
 
 def home_view(request):
+    
     '''Docstring here.'''
     arquivo = None
     mensagem = []
-    mature_dir = os.path.join(BASE_DIR, 'papaya_dataset_/papaya_dataset_01/mature/')
-    partiallymature_dir = os.path.join(BASE_DIR, 'papaya_dataset_/papaya_dataset_01/partiallymature/')
-    unmature_dir = os.path.join(BASE_DIR, 'papaya_dataset_/papaya_dataset_01/unmature/')
     if request.method=='POST':
+        # ETAPA 1 - Realizando importações 
 
-        mature_images = os.listdir(mature_dir)
-        partiallymature_images = os.listdir(partiallymature_dir)
-        unmature_images = os.listdir(unmature_dir)
-        train_mature_images = mature_images[:int(.8*(len(mature_images)))]
-        val_mature_images = mature_images[int(.8*(len(mature_images))):]
-
-        train_partiallymature_images = partiallymature_images[:int(.8*(len(partiallymature_images)))]
-        val_partiallymature_images = partiallymature_images[int(.8*(len(partiallymature_images))):]
-
-        train_unmature_images = unmature_images[:int(.8*(len(unmature_images)))]
-        val_unmature_images = unmature_images[int(.8*(len(unmature_images))):]
-        # Gerando dados 
-        train_dir = 'train_data/'
-        val_dir = 'val_data/'
-        try:
-            os.makedirs(os.path.join(BASE_DIR, train_dir, 'mature/'))
-        except:
-            pass
-        try:
-            os.makedirs(os.path.join(BASE_DIR, train_dir, 'partiallymature/'))
-        except:
-            pass
-        try:
-            os.makedirs(os.path.join(BASE_DIR, train_dir, 'unmature/'))
-        except:
-            pass
-
-        try:
-            os.makedirs(os.path.join(BASE_DIR, val_dir, 'mature/'))
-        except:
-            pass
-        try:
-            os.makedirs(os.path.join(BASE_DIR, val_dir, 'partiallymature/'))
-        except:
-            pass
-        try:
-            os.makedirs(os.path.join(BASE_DIR, val_dir, 'unmature/'))
-        except:
-            pass
-
-
-        for image in train_mature_images:
-            src = mature_dir + image
-            dst = os.path.join(BASE_DIR, train_dir, 'mature/')
-            shutil.copy(src, dst)
-
-        for image in train_partiallymature_images:
-            src = partiallymature_dir + image
-            dst = os.path.join(BASE_DIR, train_dir, 'partiallymature/')
-            shutil.copy(src, dst)
-
-        for image in train_unmature_images:
-            src = unmature_dir + image
-            dst = os.path.join(BASE_DIR, train_dir, 'unmature/')
-            shutil.copy(src, dst)
-
-        for image in val_mature_images:
-            src = mature_dir + image
-            dst = os.path.join(BASE_DIR, val_dir, 'mature/')
-            shutil.copy(src, dst)
-
-        for image in val_partiallymature_images:
-            src = partiallymature_dir + image
-            dst = os.path.join(BASE_DIR, val_dir, 'partiallymature/')
-            shutil.copy(src, dst)
-
-        for image in val_unmature_images:
-            src = unmature_dir + image
-            dst = os.path.join(BASE_DIR, val_dir, 'unmature/')
-            shutil.copy(src, dst)
         
         
 
-        train_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.,validation_split=0.2)
-        val_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.)
-        test_data_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1/255.)
+        #Carregando DATASET
+        folder = os.path.join(BASE_DIR, 'papaya_dataset_/papaya_dataset_01/')
 
-        train_dataset = train_data_gen.flow_from_directory(
-            os.path.join(BASE_DIR, train_dir),
-            target_size = (227,227),
-            class_mode = 'categorical',
-            subset="training"
+        # ETAPA 2 - Carregando o dataset
+        image_width = 64
+        image_height = 64
+        channels = 3
 
-        )
+        train_files = []
+        i=0
+        for estado in ['mature', 'partiallymature', 'unmature']:
+            onlyfiles = [f for f in os.listdir(folder + '/' + str(estado)) if os.path.isfile(os.path.join(folder + '/' + str(estado), f))]
+            for _file in onlyfiles:
+                train_files.append(_file)
 
-        val_dataset = val_data_gen.flow_from_directory(
-            os.path.join(BASE_DIR, train_dir),
-            target_size = (227,227),
-            class_mode = 'categorical',
-            subset="validation"
-        )
+        dataset = np.ndarray(shape=(len(train_files), image_height, image_width, channels),dtype=np.float32)
+        y_dataset = []
 
-        test_dataset = test_data_gen.flow_from_directory(
-            os.path.join(BASE_DIR, val_dir),
-            target_size = (227,227),
-            class_mode = 'categorical'
-        )
+        i = 0
+        for estado in ['mature', 'partiallymature', 'unmature']:
+            onlyfiles = [f for f in os.listdir(folder + '/' + str(estado)) if os.path.isfile(os.path.join(folder + '/' + str(estado), f))]
+            for _file in onlyfiles:
+                ###
+                img = cv2.imread(os.path.join(folder, estado, _file))
+                img_resized = cv2.resize(img, (image_width, image_height))
 
-        model = tf.keras.Sequential()
-        model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(227, 227, 3)))
-        model.add(tf.keras.layers.MaxPooling2D((2, 2)))
-        model.add(tf.keras.layers.Flatten())
+                dataset[i] = img_resized
+                mapping = {'mature': 0, 'partiallymature': 1, 'unmature': 2}
+                y_dataset.append(mapping[estado])
+                ###
+                i += 1
+                if i % 250 == 0:
+                    print("%d images to array" % i)
+        print("All images to array!")
 
-        model.add(tf.keras.layers.Dense(64, activation='relu'))
-        model.add(tf.keras.layers.Dense(3, activation='softmax'))
+        # Normalizando os dados
+        dataset = dataset.astype('float32')
+        dataset /= 255
 
-        opt = tf.keras.optimizers.Adam(learning_rate=0.0001)
+        pixels = np.array(dataset[0], dtype='float32')
+        plt.imshow(cv2.cvtColor(pixels, cv2.COLOR_BGR2RGB))
+        plt.show()
+        plt.close()
 
+        
+        n_classes = len(set(y_dataset))
+        print(n_classes)
+
+        y_dataset_ = to_categorical(y_dataset, n_classes)
+
+        X_train, X_test, y_train, y_test = train_test_split(dataset, y_dataset_, test_size=0.2)
+        print("Train set size: {0}, Test set size: {1}".format(len(X_train), len(X_test)))
+
+        
+        # ETAPA 3 - Criando o modelo
+
+        datagen = ImageDataGenerator(rotation_range=90, shear_range=0.2, horizontal_flip=True, fill_mode='nearest')
+
+        datagen.fit(X_train)
+
+        model = Sequential()
+        model.add(Conv2D(128, (3, 3), activation='relu', input_shape=(64, 64, 3)))
+        model.add(MaxPooling2D((2, 2)))
+        model.add(Flatten())
+
+        model.add(Flatten())
+        model.add(Dense(256, activation='relu'))
+        model.add(Dropout(0.5))
+        model.add(Dense(3, activation='softmax'))
+        
         model.summary()
-        model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        # Taxa de aprendizado
+        opt = tf.keras.optimizers.Adam(learning_rate=0.001)
 
+        # Compilando o modelo
+        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
-        #early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_accuracy', mode = 'max', patience = 5)
+        # Parada antecipada
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor = 'val_loss', mode = 'max', patience = 5)
 
-        history = model.fit(train_dataset, epochs=5, validation_data=val_dataset)
+        # Treinando o modelo
+        history = model.fit(X_train, y_train, validation_split=0.2, epochs=20, callbacks = [early_stopping])
         
+
+        # Gráfico de treinamento e validação da função perda
         plt.plot(history.history['loss'], label = 'loss')
-        plt.plot(history.history['accuracy'], label = 'accuracy')
+        plt.plot(history.history['val_loss'], label = 'val_loss')
         plt.title("Função de perda")
         plt.xlabel('Épocas')
         plt.ylabel('MSE')
         plt.legend(["Treinando"], loc='upper left')
-        plt.savefig('my_figure.png')
+        #plt.grid(True)
+        plt.savefig(os.path.join(BASE_DIR, 'graphs/graph_erro.png'))
+        plt.close()
+        
 
-        from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-        import numpy as np
-        # Fazendo previsões no conjunto de validação
-        #predictions = model.predict(val_dataset)
-        #predicted_classes = np.argmax(predictions, axis=-1)
-        output_model = np.argmax(model.predict(test_dataset), axis=-1)
-        #y_test_class =np.argmax(test_dataset, axis=-1)
+        # Gráfico de treinamento e validação da acurácia
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.yscale("log")
+        plt.title('Acurácia')
+        plt.ylabel('Acurácia')
+        plt.xlabel('Épocas')
+        plt.legend(['Treino', 'Validação'])
+        #plt.grid(True)
+        plt.savefig(os.path.join(BASE_DIR, 'graphs/graph_treinamento_validacao_acuracia.png'))
+        plt.close()
 
-        # Obtendo as classes verdadeiras do conjunto de validação
-        true_classes = test_dataset.classes
-        print("P Classes", output_model)
-        print("T Classes ", true_classes)
+        preds = model.predict(X_test)
 
-        # Calculando as métricas de avaliação
-        accuracy = accuracy_score(true_classes, output_model)
-        precision = precision_score(true_classes, output_model, average='macro')
-        recall = recall_score(true_classes, output_model, average='macro')
-        f1 = f1_score(true_classes, output_model, average='macro')
+        test_image = Image.open(os.path.join(BASE_DIR, 'Mamão maduro(imagem tirada da internet).jpeg'))
+        test_image = test_image.resize((64, 64))  # Redimensiona para o tamanho esperado pelo modelo
+        test_image = tf.keras.preprocessing.image.img_to_array(test_image)
+        test_image = test_image / 255.0 
+        test_image = tf.expand_dims(test_image, axis=0)
+        prediction = model.predict(test_image)
+        class_index = np.argmax(prediction)
+        classes = ['maduro', 'parcialmente maduro', 'não maduro']
+        resultado = classes[class_index]
+        print(resultado)
+        n = 10
+        total_images = len(X_test)
+        for t in range(total_images // n):
+            plt.figure(figsize=(15,15))
 
+            for i in range(n*t, min(n*(t+1), total_images)):
+                plt.subplot(1, n, i + 1 - n*t)
+                plt.imshow(cv2.cvtColor(X_test[i], cv2.COLOR_BGR2RGB), cmap='gray')
+                plt.title('Label: {}\nPredicted: {}'.format(np.argmax(y_test[i]), np.argmax(preds[i])))
+                plt.axis('off')
+            plt.savefig(os.path.join(BASE_DIR, 'images_pred/graph_predicao_{}.png'.format(t)))
+            plt.close()
+
+
+        y_test_ = [np.argmax(x) for x in y_test]
+        preds_ = [np.argmax(x) for x in preds]
+
+        cm = confusion_matrix(y_test_, preds_)
+        plot_confusion_matrix(cm, classes=['mature', 'partiallymature', 'unmature'], title='Confusion matrix')
+        plt.savefig(os.path.join(BASE_DIR, 'graphs/graph_confusion_matrix.png'))
+        plt.close()
+
+        # Calcular acurácia
+        accuracy = accuracy_score(y_test_, preds_)
         print("Acurácia:", accuracy)
+
+        # Calcular precisão
+        precision = precision_score(y_test_, preds_, average='macro')
         print("Precisão:", precision)
-        print("Sensibilidade:", recall)
-        print("F1-Score:", f1)
 
-        from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-        cm = confusion_matrix(true_classes, output_model)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-        disp.plot()
-        disp.ax_.set_title('Matriz de Confusão')
-        disp.ax_.set_xlabel('Classificação Prevista')
-        disp.ax_.set_ylabel('Classificação Real')
-        plt.savefig('confusion_matrix.png')
+        # Calcular recall
+        recall = recall_score(y_test_, preds_, average='macro')
+        print("Recall:", recall)
 
-        # Carrega o modelo treinado
-        model.save(os.path.join(BASE_DIR,'model_train.h5'))
+        # Calcular F1 score
+        f1 = f1_score(y_test_, preds_, average='macro')
+        print("F1-score:", f1)
+
+        # Convertendo o histórico de treinamento em um DataFrame do Pandas
+        historico = pd.DataFrame(history.history)
+
+        # Salvando o DataFrame em um arquivo CSV
+        historico.to_csv(os.path.join(BASE_DIR, 'historico.csv'), index=False)
+
+        # saving model
+        model.save(os.path.join(BASE_DIR, 'models_train/modelfilev5.h5'))
 
         mensagem.append(f"O modelo foi treinado com sucesso.")
+
         
     context = {
         "arquivo": arquivo,
