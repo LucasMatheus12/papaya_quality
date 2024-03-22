@@ -171,17 +171,7 @@ def home_view(request):
         plt.close()
 
         preds = model.predict(X_test)
-
-        test_image = Image.open(os.path.join(BASE_DIR, 'Mamão maduro(imagem tirada da internet).jpeg'))
-        test_image = test_image.resize((64, 64))  # Redimensiona para o tamanho esperado pelo modelo
-        test_image = tf.keras.preprocessing.image.img_to_array(test_image)
-        test_image = test_image / 255.0 
-        test_image = tf.expand_dims(test_image, axis=0)
-        prediction = model.predict(test_image)
-        class_index = np.argmax(prediction)
-        classes = ['maduro', 'parcialmente maduro', 'não maduro']
-        resultado = classes[class_index]
-        print(resultado)
+        
         n = 10
         total_images = len(X_test)
         for t in range(total_images // n):
