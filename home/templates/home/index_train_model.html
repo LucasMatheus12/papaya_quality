@@ -77,13 +77,13 @@
     <form class="resultado" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         <br>
-        <button type="submit">Treinar</button>
+        <button type="submit">Treinar Modelo</button>
         <h1 >
-        Resultado: {{mensagem|default:""}}
+        Resultado: {% for mensagem in mensagens %}{{mensagem|default:""}}{% endfor %}
         </h1>
     </form>
     <br><br>
-    <a href="/teste_treinado/"> <button>Enviar arquivo e TESTAR</button> </a>
+    <a href="/"> <button>Enviar Arquivo</button> </a>
     
     <br>
 </body>

@@ -78,17 +78,22 @@
         <input type="file" name="arquivo" >
         <br>
         <h1></h1>
-        <button type="submit">Enviar</button>
-        <h1>Resultado: {{mensagem|default:""}}</h1>
+        <button type="submit">Enviar arquivo</button>
+        <h1>Resultado: {% for mensagem in mensagens %}{{mensagem|default:""}}{% endfor %}
+            
+        </h1>
     </form>
     
     <br>
 
     <br>
 
-    <a href="/"> 
-        <button title="Clique para treinar a aplicação novamente">TREINE a aplicação</button> 
+    {% if request.user.is_superuser %}
+
+    <a href="/train-papaya/"> 
+        <button title="Clique para treinar a aplicação novamente">Treinar a aplicação</button> 
     </a>
+    {% endif %}
 
 </body>
 </html>

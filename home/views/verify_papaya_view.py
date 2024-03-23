@@ -9,11 +9,12 @@ import matplotlib
 matplotlib.use('agg')
 import tensorflow as tf
 import cv2
+from django.http import JsonResponse
 
-def teste_treinado_view(request):
+def verify_papaya_view(request):
     '''Docstring here.'''
     arquivo = None
-    mensagem = []
+    mensagens = []
     if request.method=='POST':
         arquivo = request.FILES.get('arquivo')
         
@@ -35,7 +36,7 @@ def teste_treinado_view(request):
 
         # Adiciona uma dimensão extra para a amostra (batch)
         # Carrega o modelo treinado
-        model = tf.keras.models.load_model(os.path.join(BASE_DIR,'models_train/modelfilev5.h5'))
+        model = tf.keras.models.load_model(os.path.join(BASE_DIR,'models_train/modelfile.h5'))
 
         # Faz a previsão
         prediction = model.predict(imagem_resized)
@@ -46,17 +47,23 @@ def teste_treinado_view(request):
         # Mapeia o índice da classe para a classe correspondente
         classes = ['maduro', 'parcialmente maduro', 'não maduro']
         resultado = classes[class_index]
-        mensagem.append(f"O modelo prevê que a fruta é {resultado}.")
+        mensagens.append(f"O modelo prevê que a fruta é {resultado}.")
         # Exclui o arquivo temporário
         os.remove(file_path)
+        if request.POST.get("methodJson", False):
+            context = {
+                #"arquivo": arquivo,
+                "mensagens": mensagens
+            }
+            return JsonResponse(context, safe=False)
+
     
     context = {
         "arquivo": arquivo,
-        "mensagem": mensagem
+        "mensagens": mensagens
     }
-
     return render(
         request,
-        'home/index.html',
+        'home/index_verify.html',
         context,
     )

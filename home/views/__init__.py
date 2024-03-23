@@ -1,6 +1,6 @@
-from .home_view import home_view
-from .teste_treinado_view import teste_treinado_view
+from .train_papaya_view import train_papaya_view
+from .verify_papaya_view import verify_papaya_view
 __all__ = [
-    home_view,
-    teste_treinado_view
+    train_papaya_view,
+    verify_papaya_view
 ]

@@ -13,7 +13,7 @@ from keras.utils import to_categorical
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
-from PIL import Image
+from training_tool.models import TrainingTool
 
 def plot_confusion_matrix(
         cm, 
@@ -51,11 +51,11 @@ def plot_confusion_matrix(
     plt.ylabel('True class')
     plt.xlabel('Predicted class')
 
-def home_view(request):
+def train_papaya_view(request):
     
     '''Docstring here.'''
     arquivo = None
-    mensagem = []
+    mensagens = []
     if request.method=='POST':
         # ETAPA 1 - Realizando importações 
 
@@ -194,6 +194,8 @@ def home_view(request):
         plt.savefig(os.path.join(BASE_DIR, 'graphs/graph_confusion_matrix.png'))
         plt.close()
 
+            
+
         # Calcular acurácia
         accuracy = accuracy_score(y_test_, preds_)
         print("Acurácia:", accuracy)
@@ -217,19 +219,48 @@ def home_view(request):
         historico.to_csv(os.path.join(BASE_DIR, 'historico.csv'), index=False)
 
         # saving model
-        model.save(os.path.join(BASE_DIR, 'models_train/modelfilev5.h5'))
+        model.save(os.path.join(BASE_DIR, 'models_train/modelfile.h5'))
 
-        mensagem.append(f"O modelo foi treinado com sucesso.")
+        ### Futura Versão
+        """ file_path = os.path.join(BASE_DIR, 'models_train/modelfile.h5')
+        with open(file_path, 'rb') as file:
+            f_modelo = file.read()
+
+        file_path = os.path.join(BASE_DIR, 'graphs/graph_erro.png')
+        with open(file_path, 'rb') as file:
+            f_graph_erro = file.read()
+
+        file_path = os.path.join(BASE_DIR, 'graphs/graph_treinamento_validacao_acuracia.png')
+        with open(file_path, 'rb') as file:
+            f_graph_acuracia = file.read()
+
+        file_path = os.path.join(BASE_DIR, 'graphs/graph_confusion_matrix.png')
+        with open(file_path, 'rb') as file:
+            f_graph_cm = file.read()
+
+        file_path = os.path.join(BASE_DIR, 'historico.csv')
+        with open(file_path, 'rb') as file:
+            f_historico = file.read()
+
+        TrainingTool.objects.create(
+            model=f_modelo,
+            graph_erro=f_graph_erro,
+            graph_acuracia=f_graph_acuracia,
+            graph_confusion_matrix=f_graph_cm,
+            historico=f_historico
+        ) """
+
+        mensagens.append(f"O modelo foi treinado com sucesso.")
 
         
     context = {
         "arquivo": arquivo,
-        "mensagem": mensagem,
+        "mensagens": mensagens,
         
     }
 
     return render(
         request,
-        'home/index_treinamento.html',
+        'home/index_train_model.html',
         context,
     )
