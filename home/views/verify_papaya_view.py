@@ -50,7 +50,7 @@ def verify_papaya_view(request):
         mensagens.append(f"O modelo prevê que a fruta é {resultado}.")
         # Exclui o arquivo temporário
         os.remove(file_path)
-        if request.POST.get("methodJson", False):
+        if not request.POST.get("methodJson", False):
             context = {
                 #"arquivo": arquivo,
                 "mensagens": mensagens
